@@ -2,7 +2,7 @@
 
 ## Estado
 
-Plan inicial generado el 2026-09-17 a partir de `PRD.md`, `RESTRICCIONES_TECNICAS.md` y `database/REQUISITOS_NORMALIZACION_3FN.md`. Todas las historias están en **Borrador** y requieren revisión explícita antes de pasar a `Aprobada`.
+Plan inicial generado el 2026-09-17 a partir de `PRD.md`, `RESTRICCIONES_TECNICAS.md` y `database/REQUISITOS_NORMALIZACION_3FN.md`. La ejecución autorizada dejó [[HU-001-registrar-usuario]] y [[HU-002-iniciar-sesion]] en `Completada`; [[HU-003-renovar-y-cerrar-sesion]] sigue `En validación` por logout pendiente. Las demás HU continúan en **Borrador** y requieren revisión explícita antes de pasar a `Aprobada`.
 
 ## Épicas
 

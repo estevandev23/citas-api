@@ -2,7 +2,7 @@
 id: EP-001
 tipo: epica
 titulo: "Identidad y acceso"
-estado: Borrador
+estado: En desarrollo
 historias: ["[[HU-001-registrar-usuario]]", "[[HU-002-iniciar-sesion]]", "[[HU-003-renovar-y-cerrar-sesion]]", "[[HU-004-recuperar-contrasena]]"]
 dependencias: []
 ---
@@ -30,4 +30,5 @@ Base de acceso para las capacidades protegidas.
 - [ ] Todas las HU están `Completada` con evidencia.
 - [ ] No hay secretos ni tokens expuestos.
 ## Riesgos e incógnitas
-- Contrato REST, expiraciones y exposición segura del token de recuperación pendientes.
+- Recuperación y logout siguen sin contrato REST. La custodia del refresh token en el navegador requiere decisión cross-repo antes de implementar el cliente.
+- Estado al 2026-09-22: [[HU-001-registrar-usuario]] está completada; [[HU-002-iniciar-sesion]] y [[HU-003-renovar-y-cerrar-sesion]] permanecen en validación por trabajo frontend/logout pendiente.

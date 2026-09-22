@@ -10,6 +10,8 @@ Las contraseñas usan hash adaptativo compatible con Spring Security. Los secret
 
 No se deben registrar passwords o tokens. Los datos de pacientes, profesionales, credenciales, EPS, planes, horarios y citas son sintéticos, salvo referencias públicas incluidas expresamente en requisitos.
 
+DECISIÓN — el frontend de autenticación conserva los tokens solo en memoria de la pestaña. Esto evita persistirlos en almacenamiento JavaScript con el contrato actual; recargar vuelve el cliente a estado anónimo. La persistencia segura del refresh requiere una decisión cross-repo y un contrato distinto (por ejemplo, cookie HttpOnly con CORS de credenciales).
+
 ## Evidencia
 
 - [PRD 1.0](../raw/2026-09-15-prd-v1.md)

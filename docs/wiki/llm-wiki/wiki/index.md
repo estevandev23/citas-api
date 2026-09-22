@@ -9,6 +9,7 @@
 5. [Seguridad](security.md)
 6. [Decisiones](decisions.md)
 7. [Riesgos y preguntas abiertas](risks-and-open-questions.md)
+8. [Identidad visual de autenticación](visual-identity.md)
 
 ## Operación y entrega
 
