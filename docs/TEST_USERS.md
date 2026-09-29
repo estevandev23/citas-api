@@ -6,6 +6,7 @@ Al iniciar `citas-api` con el perfil `local` (configuración por defecto de `doc
 |---|---|---|
 | Paciente | `demo.patient@example.test` | `CitasDemo123!` |
 | Profesional | `demo.professional@example.test` | `CitasDemo123!` |
+| Profesional 2 | `demo.professional2@example.test` | `CitasDemo123!` |
 | Administrador | `demo.admin@example.test` | `CitasDemo123!` |
 
-Los registros son ficticios y solo se generan en el perfil `local`. El cargador no reemplaza usuarios existentes; puede ejecutarse varias veces sin duplicar profesionales, bloques ni citas.
+El profesional 1 (`DEMO-PRO`) trabaja en HIC/ICV y tiene una cita de Medicina General; el profesional 2 (`DEMO-PRO-002`) trabaja en ICV y tiene una cita diferente de Medicina Interna. Los registros son ficticios y solo se generan en el perfil `local`. El cargador no reemplaza usuarios existentes; puede ejecutarse varias veces sin duplicar profesionales, bloques ni citas.

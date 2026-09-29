@@ -104,4 +104,16 @@ class SchedulingFlowTest {
         mvc.perform(post("/api/v1/admin/appointments/" + appointmentId + "/decision").header("Authorization", "Bearer " + f.admin()).queryParam("approve", "false").queryParam("reason", "No disponibilidad confirmada")).andExpect(status().isOk());
         mvc.perform(get("/api/v1/availability").header("Authorization", "Bearer " + f.patient()).param("facilityCode", "HIC").param("specialtyCode", "NEUROLOGIA").param("date", day.toString())).andExpect(status().isOk());
     }
+
+    @Test
+    void patientCanCancelApprovedAppointmentAndReleaseSlot() throws Exception {
+        Fixture f = fixture(UUID.randomUUID().toString().substring(0, 8)); LocalDate day = LocalDate.now().plusDays(6); LocalDateTime start = day.atTime(8, 0);
+        postJson("/api/v1/professional/availability", f.professional(), Map.of("facilityCode", "HIC", "date", day, "startTime", "08:00:00", "endTime", "09:00:00"));
+        MvcResult booked = postJson("/api/v1/appointments", f.patient(), Map.of("facilityCode", "HIC", "specialtyCode", "MEDICINA_GENERAL", "professionalId", f.professionalId(), "startAt", start));
+        long appointmentId = parse(booked).get("id").asLong();
+        mvc.perform(post("/api/v1/appointments/" + appointmentId + "/cancel").header("Authorization", "Bearer " + f.patient())).andExpect(status().isOk());
+        MvcResult mine = mvc.perform(get("/api/v1/appointments/me").header("Authorization", "Bearer " + f.patient())).andReturn();
+        assertThat(parse(mine).findValue("id").toString()).contains(String.valueOf(appointmentId));
+        assertThat(parse(mine).findValuesAsText("status")).contains("CANCELLED");
+    }
 }
