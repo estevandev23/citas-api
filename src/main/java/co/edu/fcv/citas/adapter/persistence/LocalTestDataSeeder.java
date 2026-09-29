@@ -36,7 +36,7 @@ class LocalTestDataSeeder {
         }
         long patient = user("demo.patient@example.test", "Paciente", "Demo", "DEMO-PATIENT-001", "USER");
         long professionalUser = user("demo.professional@example.test", "Profesional", "Demo", "DEMO-PRO-001", "USER", "PROFESSIONAL");
-        long professionalUser2 = user("demo.professional2@example.test", "Profesional", "Dos", "DEMO-PATIENT-002", "USER", "PROFESSIONAL");
+        long professionalUser2 = user("demo.professional2@example.test", "Profesional", "Dos", "DEMO-PRO-USER-002", "USER", "PROFESSIONAL");
         long admin = user("demo.admin@example.test", "Administrador", "Demo", "DEMO-ADMIN-001", "USER", "ADMIN");
         jdbc.update("INSERT IGNORE INTO user_affiliation(user_id,insurer_code,plan_code,regime_code) VALUES(?,?,?,?)", patient, "EPS_LAB", "BASIC", "CONTRIBUTORY");
         jdbc.update("INSERT IGNORE INTO user_affiliation(user_id,insurer_code,plan_code,regime_code) VALUES(?,?,?,?)", professionalUser, "EPS_LAB", "PLUS", "CONTRIBUTORY");
