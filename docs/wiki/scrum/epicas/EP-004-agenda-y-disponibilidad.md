@@ -2,7 +2,7 @@
 id: EP-004
 tipo: epica
 titulo: "Agenda y disponibilidad"
-estado: Borrador
+estado: Completada
 historias: ["[[HU-011-gestionar-bloques-de-agenda]]", "[[HU-012-consultar-disponibilidad]]"]
 dependencias: ["[[EP-003-gestion-de-profesionales]]"]
 ---
@@ -25,7 +25,7 @@ El usuario elige horarios basados en disponibilidad real.
 - [[HU-011-gestionar-bloques-de-agenda]]
 - [[HU-012-consultar-disponibilidad]]
 ## Criterio de completitud de la épica
-- [ ] Todas las HU están `Completada`.
-- [ ] Las reglas RN-05 a RN-08 aplicables tienen evidencia.
+- [x] Todas las HU están `Completada`.
+- [x] Las reglas RN-05 a RN-08 aplicables tienen evidencia.
 ## Riesgos e incógnitas
 - Cita comprometida, zona horaria y concurrencia pendientes.

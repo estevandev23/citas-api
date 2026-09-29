@@ -1,0 +1,67 @@
+{
+  "name": "WF-002 — Notificación por cambio de estado",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "citas-status-events", "responseMode": "responseNode", "options": {} },
+      "id": "wf002-webhook",
+      "name": "Evento desde citas-api",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [ -720, 0 ],
+      "webhookId": "citas-status-events"
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = items[0]?.json?.body || items[0]?.json || {};\nconst allowed = new Set(['APPOINTMENT:APPROVED','APPOINTMENT:REJECTED','RESCHEDULE:APPROVED','RESCHEDULE:REJECTED','APPOINTMENT:CANCELLED']);\nconst eventKey = `${String(event.type || '').toUpperCase()}:${String(event.status || '').toUpperCase()}`;\nconst supported = allowed.has(eventKey);\nif (!event.email && supported) throw new Error('El evento no incluye email de laboratorio');\nreturn [{ json: { ...event, eventKey, supported, recipient: event.email, subject: `Actualización de cita — ${event.status || 'evento'}`, message: `La cita sintética ${event.appointmentId || ''} cambió a ${event.status || 'un nuevo estado'}.` } }];"
+      },
+      "id": "wf002-validate",
+      "name": "Validar y clasificar evento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ -480, 0 ]
+    },
+    {
+      "parameters": { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [ { "leftValue": "={{$json.supported}}", "rightValue": true, "operator": { "type": "boolean", "operation": "true" } } ], "combinator": "and" } },
+      "id": "wf002-supported",
+      "name": "¿Evento soportado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [ -240, 0 ]
+    },
+    {
+      "parameters": { "resource": "message", "operation": "send", "sendTo": "={{$json.recipient}}", "subject": "={{$json.subject}}", "emailType": "text", "message": "={{$json.message}}" },
+      "id": "wf002-gmail",
+      "name": "Enviar notificación Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [ 0, -80 ]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{JSON.stringify({ok:true, workflow:'WF-002', eventKey:$json.eventKey, delivered:true})}}", "options": {} },
+      "id": "wf002-response-ok",
+      "name": "Responder OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [ 240, -80 ]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{JSON.stringify({ok:false, workflow:'WF-002', error:'UNSUPPORTED_EVENT'})}}", "options": { "responseCode": 422 } },
+      "id": "wf002-response-error",
+      "name": "Responder evento inválido",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [ 0, 120 ]
+    }
+  ],
+  "connections": {
+    "Evento desde citas-api": { "main": [ [ { "node": "Validar y clasificar evento", "type": "main", "index": 0 } ] ] },
+    "Validar y clasificar evento": { "main": [ [ { "node": "¿Evento soportado?", "type": "main", "index": 0 } ] ] },
+    "¿Evento soportado?": { "main": [ [ { "node": "Enviar notificación Gmail", "type": "main", "index": 0 } ], [ { "node": "Responder evento inválido", "type": "main", "index": 0 } ] ] },
+    "Enviar notificación Gmail": { "main": [ [ { "node": "Responder OK", "type": "main", "index": 0 } ] ] }
+  },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true },
+  "versionId": "00000000-0000-4000-8000-000000000002",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

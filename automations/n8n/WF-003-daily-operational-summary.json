@@ -1,0 +1,15 @@
+{
+  "name": "WF-003 — Resumen operativo diario",
+  "active": false,
+  "nodes": [
+    { "parameters": { "rule": { "interval": [ { "field": "days", "daysInterval": 1, "triggerAtHour": 18, "triggerAtMinute": 0 } ] } }, "id": "wf003-schedule", "name": "Cierre diario", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [ -480, 0 ] },
+    { "parameters": { "method": "GET", "url": "={{($env.CITAS_API_BASE_URL || 'http://citas-api:8080') + '/api/v1/operational-summary?date=' + $now.toFormat('yyyy-MM-dd')}}", "sendHeaders": true, "headerParameters": { "parameters": [ { "name": "Authorization", "value": "={{'Bearer ' + ($env.CITAS_API_TOKEN || '')}}" } ] } }, "id": "wf003-api", "name": "Consultar resumen API", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [ -240, 0 ] },
+    { "parameters": { "jsCode": "const s = items[0]?.json || {}; return [{ json: { ...s, subject: 'Resumen operativo diario — laboratorio', message: `Citas del día: ${s.total ?? 0}. Este resumen contiene únicamente datos sintéticos.` } }];" }, "id": "wf003-format", "name": "Formatear resumen", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [ 0, 0 ] },
+    { "parameters": { "resource": "message", "operation": "send", "sendTo": "={{$env.OPERATIONS_EMAIL || ''}}", "subject": "={{$json.subject}}", "emailType": "text", "message": "={{$json.message}}" }, "id": "wf003-gmail", "name": "Enviar resumen Gmail", "type": "n8n-nodes-base.gmail", "typeVersion": 2.1, "position": [ 240, 0 ] }
+  ],
+  "connections": { "Cierre diario": { "main": [ [ { "node": "Consultar resumen API", "type": "main", "index": 0 } ] ] }, "Consultar resumen API": { "main": [ [ { "node": "Formatear resumen", "type": "main", "index": 0 } ] ] }, "Formatear resumen": { "main": [ [ { "node": "Enviar resumen Gmail", "type": "main", "index": 0 } ] ] } },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true },
+  "versionId": "00000000-0000-4000-8000-000000000003",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

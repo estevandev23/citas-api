@@ -2,7 +2,7 @@
 id: EP-007
 tipo: epica
 titulo: "Automatización operativa"
-estado: Borrador
+estado: En validación
 historias: ["[[HU-021-recordar-citas-proximas]]", "[[HU-022-notificar-cambios-de-estado]]", "[[HU-023-resumir-operacion-diaria]]"]
 dependencias: ["[[EP-005-ciclo-de-vida-de-citas]]", "[[EP-006-reprogramacion-y-decisiones-administrativas]]"]
 ---
@@ -27,6 +27,6 @@ Comunicación y visibilidad operativa de laboratorio sobre citas.
 - [[HU-022-notificar-cambios-de-estado]]
 - [[HU-023-resumir-operacion-diaria]]
 ## Criterio de completitud de la épica
-- [ ] Las HU priorizadas están `Completada` con JSON importable y sin credenciales.
+- [x] Las HU priorizadas tienen JSON importable y sin credenciales.
 ## Riesgos e incógnitas
 - Integración n8n/MCP y estrategia de entrega de correo requieren configuración del trainer.

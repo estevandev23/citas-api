@@ -2,7 +2,7 @@
 
 ## Estado
 
-Plan inicial generado el 2026-09-17 a partir de `PRD.md`, `RESTRICCIONES_TECNICAS.md` y `database/REQUISITOS_NORMALIZACION_3FN.md`. La ejecución autorizada dejó [[HU-001-registrar-usuario]] y [[HU-002-iniciar-sesion]] en `Completada`; [[HU-003-renovar-y-cerrar-sesion]] sigue `En validación` por logout pendiente. Las demás HU continúan en **Borrador** y requieren revisión explícita antes de pasar a `Aprobada`.
+Plan inicial generado el 2026-09-17 a partir de `PRD.md`, `RESTRICCIONES_TECNICAS.md` y `database/REQUISITOS_NORMALIZACION_3FN.md`. Las HU-001 a HU-020 tienen implementación y evidencia Docker; HU-021 a HU-023 tienen JSON n8n preparado sin credenciales y quedan listas para activación en la instancia del trainer.
 
 ## Épicas
 
@@ -39,11 +39,8 @@ Los incrementos no expresan duración, capacidad ni estimaciones temporales. Cad
 
 ## Decisiones pendientes antes de desarrollo de HU dependientes
 
-- Contrato REST: recursos, payloads, errores, códigos HTTP y versionado.
-- Máquina de estados completa de cita y reprogramación.
-- Estrategia transaccional, idempotencia y vencimiento de retenciones de slots.
-- Mecanismo seguro para crear el primer ADMIN y para recuperación de contraseña en desarrollo.
-- Stack frontend real y evidencia del diseño aprobado de Stitch/Google AI Studio.
+- Activación controlada de Gmail/MCP en la instancia n8n del trainer.
+- Publicación de `main` tras revisión final; `develop` conserva la trazabilidad de trabajo.
 
 ## Regla de aprobación y evidencia
 

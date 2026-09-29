@@ -9,4 +9,5 @@ public interface UserAccounts {
     boolean emailExists(String email);
     boolean documentExists(String type, String number);
     UserAccount saveUser(UserAccount user);
+    void updatePassword(Long userId, String passwordHash);
 }

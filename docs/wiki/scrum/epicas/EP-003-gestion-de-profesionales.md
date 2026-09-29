@@ -2,7 +2,7 @@
 id: EP-003
 tipo: epica
 titulo: "Gestión de profesionales"
-estado: Borrador
+estado: Completada
 historias: ["[[HU-009-registrar-profesional]]", "[[HU-010-configurar-habilitaciones-profesional]]"]
 dependencias: ["[[EP-002-perfil-y-catalogos]]"]
 ---
@@ -25,7 +25,7 @@ Profesionales correctamente habilitados para agenda y citas.
 - [[HU-009-registrar-profesional]]
 - [[HU-010-configurar-habilitaciones-profesional]]
 ## Criterio de completitud de la épica
-- [ ] Todas las HU están `Completada`.
-- [ ] Solo profesionales habilitados participan en disponibilidad.
+- [x] Todas las HU están `Completada`.
+- [x] Solo profesionales habilitados participan en disponibilidad.
 ## Riesgos e incógnitas
 - Restricciones de cambios con agenda existente pendientes.

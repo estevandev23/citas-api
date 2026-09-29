@@ -2,7 +2,7 @@
 id: EP-005
 tipo: epica
 titulo: "Ciclo de vida de citas"
-estado: Borrador
+estado: Completada
 historias: ["[[HU-013-reservar-cita-general]]", "[[HU-014-solicitar-cita-especializada]]", "[[HU-015-consultar-mis-citas]]", "[[HU-016-cancelar-cita]]", "[[HU-017-consultar-y-cerrar-agenda-profesional]]"]
 dependencias: ["[[EP-004-agenda-y-disponibilidad]]"]
 ---
@@ -28,7 +28,7 @@ Una experiencia de cita trazable para USER y PROFESSIONAL.
 - [[HU-016-cancelar-cita]]
 - [[HU-017-consultar-y-cerrar-agenda-profesional]]
 ## Criterio de completitud de la épica
-- [ ] Todas las HU están `Completada`.
-- [ ] Las transiciones incluidas tienen historial verificable.
+- [x] Todas las HU están `Completada`.
+- [x] Las transiciones incluidas tienen historial verificable.
 ## Riesgos e incógnitas
 - Falta máquina de estados completa y política de concurrencia/retención.

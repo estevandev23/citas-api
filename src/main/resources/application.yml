@@ -15,4 +15,10 @@ app:
     refresh-secret: ${JWT_REFRESH_SECRET}
     access-minutes: ${JWT_ACCESS_MINUTES:15}
     refresh-days: ${JWT_REFRESH_DAYS:7}
+  password-recovery:
+    expose-token: ${PASSWORD_RECOVERY_EXPOSE_TOKEN:false}
+  admin:
+    bootstrap-token: ${ADMIN_BOOTSTRAP_TOKEN:}
+  test-data:
+    enabled: ${TEST_DATA_ENABLED:false}
   frontend-origin: ${FRONTEND_ORIGIN:http://localhost:3000}

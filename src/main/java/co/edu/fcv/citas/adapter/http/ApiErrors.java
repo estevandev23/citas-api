@@ -1,6 +1,8 @@
 package co.edu.fcv.citas.adapter.http;
 
 import co.edu.fcv.citas.application.IdentityException;
+import co.edu.fcv.citas.application.ProfileException;
+import co.edu.fcv.citas.application.SchedulingException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 class ApiErrors {
     @ExceptionHandler(IdentityException.class)
     ResponseEntity<ApiError> identity(IdentityException ex) {
-        HttpStatus status = ex.code().endsWith("EXISTS") ? HttpStatus.CONFLICT : HttpStatus.UNAUTHORIZED;
+        HttpStatus status = ex.code().endsWith("EXISTS") ? HttpStatus.CONFLICT
+                : "INVALID_RESET_TOKEN".equals(ex.code()) ? HttpStatus.BAD_REQUEST : HttpStatus.UNAUTHORIZED;
         return ResponseEntity.status(status).body(new ApiError(ex.code(), ex.getMessage(), List.of()));
     }
 
@@ -22,11 +25,15 @@ class ApiErrors {
         var fields = ex.getBindingResult().getFieldErrors().stream().map(error -> error.getField()).distinct().sorted().toList();
         return ResponseEntity.badRequest().body(new ApiError("VALIDATION_ERROR", "Datos inválidos", fields));
     }
+    @ExceptionHandler(ProfileException.class)
+    ResponseEntity<ApiError> profile(ProfileException ex) { return ResponseEntity.badRequest().body(new ApiError("INVALID_AFFILIATION", ex.getMessage(), List.of())); }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiError> malformed(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(new ApiError("INVALID_JSON", "Solicitud inválida", List.of()));
     }
+    @ExceptionHandler(SchedulingException.class)
+    ResponseEntity<ApiError> scheduling(SchedulingException ex) { return ResponseEntity.badRequest().body(new ApiError(ex.code(), ex.getMessage(), List.of())); }
 
     record ApiError(String code, String message, List<String> fields) {}
 }

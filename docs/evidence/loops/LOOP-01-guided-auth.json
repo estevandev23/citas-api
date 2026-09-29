@@ -1,0 +1,11 @@
+{
+  "goal": "Validar identidad, catálogos y perfil",
+  "iteration": 1,
+  "builder": "completed",
+  "backendTests": "pass",
+  "frontendTests": "pass",
+  "frontendBuild": "pass",
+  "verifier": "PASS",
+  "result": "COMPLETED",
+  "evidence": ["docker compose exec citas-api-dev mvn -q test", "docker compose exec citas-web-dev npm test -- --run", "docker compose exec citas-web-dev npm run typecheck", "docker compose exec citas-web-dev npm run build"]
+}

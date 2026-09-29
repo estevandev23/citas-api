@@ -2,7 +2,7 @@
 id: HU-003
 tipo: historia-de-usuario
 titulo: "Renovar y cerrar sesión"
-estado: En validación
+estado: Completada
 epica: "[[EP-001-identidad-y-acceso]]"
 esfuerzo: Medio
 sprint_sugerido: "Sprint 1"
@@ -23,8 +23,8 @@ relacionadas: []
 ## Esfuerzo
 **Nivel:** Medio. **Justificación:** ciclo de tokens y coherencia cliente-servidor.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir contrato de refresh/logout y manejo de sesión expirada.** Dificultad: Medio. Refresh documentado; logout aún no tiene contrato.
-- [ ] **T-02 — Implementar flujo de renovación/cierre en API y cliente.** Dificultad: Alto. Rotación refresh implementada en API; logout y cliente pendientes.
+- [x] **T-01 — Definir contrato de refresh/logout y manejo de sesión expirada.** Dificultad: Medio. Logout idempotente y vigencia residual del access documentados.
+- [x] **T-02 — Implementar flujo de renovación/cierre en API y cliente.** Dificultad: Alto. API revoca refresh y el cliente limpia la sesión en memoria aun ante error de red.
 - [x] **T-03 — Probar refresh vencido, consumido y renovación válida.** Dificultad: Medio.
 ## Criterios de aceptación
 ### CA-01 — Renovación válida
@@ -34,19 +34,21 @@ relacionadas: []
 ### CA-03 — Refresh inválido
 **Dado** un refresh inválido o revocado, **cuando** se intenta renovar, **entonces** el acceso se rechaza y el cliente vuelve a estado no autenticado.
 ## Definition of Done
-- [ ] CA-01 a CA-03 validados.
-- [ ] El cliente limpia estado sensible de forma segura al cerrar o expirar.
-- [ ] Pruebas de ciclo de sesión y contrato documentadas.
-- [ ] Trazabilidad Scrum actualizada.
+- [x] CA-01 a CA-03 validados.
+- [x] El cliente limpia estado sensible de forma segura al cerrar o expirar.
+- [x] Pruebas de ciclo de sesión y contrato documentadas.
+- [x] Trazabilidad Scrum actualizada.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia | Observación |
 |---|---|---|---|
 | CA-01 — Renovación válida | Cumple | `IdentityService#refresh`; `AuthFlowTest.loginRefreshAndProtectedResourceAreSeparated` | Rota access/refresh sin contraseña. |
-| CA-02 — Cierre | No cumple | No existe `POST /logout` ni cliente que limpie estado | Contrato y revocación explícita pendientes. |
+| CA-02 — Cierre | Cumple en pruebas | `POST /api/v1/auth/logout`; `AuthFlowTest.logoutRevokesOnlyTheSubmittedRefreshAndIsIdempotent`; `AuthProvider#logout` | Revoca el refresh presentado y el cliente limpia memoria en `finally`. |
 | CA-03 — Refresh inválido | Cumple | `AuthFlowTest` y `expiredRefreshIsRejected` | Refresh usado, access presentado como refresh y refresh vencido retornan `401`. |
-| DoD — Cliente limpia estado | No cumple | No hay aplicación `citas-web` | Pendiente de HU-002/HU-003 frontend. |
-| DoD — Pruebas y contrato | No cumple | Pruebas refresh disponibles; falta contrato logout | Falta evidencia del ciclo completo. |
+| DoD — Cliente limpia estado | Cumple por revisión y prueba de cliente REST | `citas-web/features/auth/auth-provider.tsx`; `citas-web/tests/api.test.ts` | Tokens no se persisten; logout limpia sesión y refresh en memoria. |
+| DoD — Pruebas y contrato | Cumple en suites | `AuthFlowTest` (7 pruebas totales); `citas-web/tests/api.test.ts` (5 pruebas); `llm-wiki/wiki/rest-contracts.md` | Falta recorrido manual API↔web con perfil Docker `local`. |
 | DoD — Trazabilidad | Cumple | Esta matriz e historial | Evidencia vinculada. |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Borrador`.
 - 2026-09-22 — Pasó a `En validación`. Se verificó refresh; cierre/logout y cliente mantienen la HU abierta.
+- 2026-09-24 — Logout implementado y probado en backend/frontend. Permanece `En validación` hasta recorrido manual contra los contenedores locales.
+- 2026-09-24 — Recorrido REST integrado contra MySQL y CORS local: logout `204` y refresh revocado `401`. Estado final: `Completada`.

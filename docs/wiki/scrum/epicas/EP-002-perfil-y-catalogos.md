@@ -2,7 +2,7 @@
 id: EP-002
 tipo: epica
 titulo: "Perfil y catálogos"
-estado: Borrador
+estado: Completada
 historias: ["[[HU-005-gestionar-perfil-y-afiliacion]]", "[[HU-006-consultar-catalogos-fijos]]", "[[HU-007-administrar-eps-y-planes]]", "[[HU-008-administrar-especialidades]]"]
 dependencias: ["[[EP-001-identidad-y-acceso]]"]
 ---
@@ -27,7 +27,7 @@ Datos consistentes para usuarios, profesionales y reservas.
 - [[HU-007-administrar-eps-y-planes]]
 - [[HU-008-administrar-especialidades]]
 ## Criterio de completitud de la épica
-- [ ] Todas las HU están `Completada`.
-- [ ] Las restricciones 3FN aplicables tienen evidencia.
+- [x] Todas las HU están `Completada`.
+- [x] Las restricciones 3FN aplicables tienen evidencia.
 ## Riesgos e incógnitas
 - Política de snapshots versus FKs pendiente.

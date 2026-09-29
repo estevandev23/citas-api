@@ -1,0 +1,11 @@
+{
+  "goal": "Completar ciclo de agenda, reserva, rechazo y reprogramación",
+  "iteration": 2,
+  "builder": "completed",
+  "backendTests": "pass",
+  "frontendTests": "pass",
+  "frontendBuild": "pass",
+  "verifier": "PASS",
+  "result": "COMPLETED",
+  "evidence": ["REST Docker/MySQL: reserva general APPROVED", "REST Docker/MySQL: especializada REQUESTED y rechazo libera slot", "REST Docker/MySQL: reprogramación aprobada conserva historial", "E2E navegador: paciente y administrador autenticados"]
+}

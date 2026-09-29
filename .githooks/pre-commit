@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+set -eu
+
+echo "[citas-api] verificando espacios y secretos..."
+git diff --cached --check
+if git diff --cached --name-only | grep -E '(^|/)(\.env|.*\.pem|.*\.key)$' >/dev/null 2>&1; then
+  echo "[citas-api] bloqueo: se intenta versionar un archivo sensible (.env/.pem/.key)." >&2
+  exit 1
+fi
+if git diff --cached --unified=0 | grep -E '(JWT_(ACCESS|REFRESH)_SECRET|PASSWORD|TOKEN)[=:][[:space:]]*[A-Za-z0-9+/=_-]{20,}' | grep -vE '(CHANGE_ME|replace-with-a-local|password_hash|token_hash)' >/dev/null 2>&1; then
+  echo "[citas-api] bloqueo: posible secreto incrustado en el diff." >&2
+  exit 1
+fi
+if command -v mvn >/dev/null 2>&1; then
+  mvn -q test
+elif command -v docker >/dev/null 2>&1; then
+  docker compose -f ../docker-compose.yml exec -T citas-api-dev mvn -q test
+else
+  echo "[citas-api] no se encontró Maven ni Docker para ejecutar las pruebas." >&2
+  exit 1
+fi
+echo "[citas-api] pre-commit PASS"

@@ -1,0 +1,11 @@
+{
+  "goal": "Cerrar entrega S6 con automatizaciones versionadas y gates locales",
+  "iteration": 1,
+  "builder": "completed",
+  "backendTests": "pass",
+  "frontendTests": "pass",
+  "frontendBuild": "pass",
+  "verifier": "PASS",
+  "result": "COMPLETED",
+  "evidence": ["scripts/validate-n8n-json.ps1", "citas-api/.githooks/pre-commit", "citas-web/.githooks/pre-commit", "WF-001-appointment-reminders.json", "WF-002-status-notifications.json"]
+}

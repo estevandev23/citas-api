@@ -19,4 +19,15 @@ class TransactionalIdentityFacade {
 
     @Transactional
     public TokenService.IssuedTokens refresh(String token) { return service.refresh(token); }
+
+    @Transactional
+    public void logout(String refreshToken) { service.logout(refreshToken); }
+
+    @Transactional
+    public java.util.Optional<String> requestPasswordRecovery(String email) {
+        return service.requestPasswordRecovery(email);
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) { service.resetPassword(token, newPassword); }
 }

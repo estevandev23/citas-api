@@ -1,0 +1,81 @@
+{
+  "name": "WF-001 — Recordatorios de citas próximas",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "hours", "hoursInterval": 1 } ] } },
+      "id": "wf001-schedule",
+      "name": "Cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [ -720, 0 ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{($env.CITAS_API_BASE_URL || 'http://citas-api:8080') + '/api/v1/appointments/upcoming?status=APPROVED&withinHours=24'}}",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Authorization", "value": "={{'Bearer ' + ($env.CITAS_API_TOKEN || '')}}" } ] },
+        "options": { "timeout": 30000 }
+      },
+      "id": "wf001-api",
+      "name": "Consultar citas aprobadas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ -480, 0 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = items.flatMap(item => Array.isArray(item.json) ? item.json : (item.json.appointments || []));\nreturn source.filter(a => a.status === 'APPROVED').map(a => ({ json: { ...a, recipient: a.patientEmail || a.email, subject: `Recordatorio de cita — ${a.specialty || 'consulta'}`, message: `Tienes una cita aprobada el ${a.start || a.startAt} en ${a.facility || 'la sede seleccionada'}. Este mensaje pertenece al laboratorio sintético.` } }));"
+      },
+      "id": "wf001-normalize",
+      "name": "Preparar recordatorios",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ -240, 0 ]
+    },
+    {
+      "parameters": { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [ { "leftValue": "={{$input.all().length}}", "rightValue": 0, "operator": { "type": "number", "operation": "gt" } } ], "combinator": "and" } },
+      "id": "wf001-has-items",
+      "name": "¿Hay citas?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [ 0, 0 ]
+    },
+    {
+      "parameters": { "resource": "message", "operation": "send", "sendTo": "={{$json.recipient}}", "subject": "={{$json.subject}}", "emailType": "text", "message": "={{$json.message}}" },
+      "id": "wf001-gmail",
+      "name": "Enviar Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [ 240, -80 ]
+    },
+    {
+      "parameters": { "jsCode": "return items.map(item => ({ json: { workflow: 'WF-001', result: 'REMINDER_SENT', appointmentId: item.json.id || null, processedAt: new Date().toISOString() } }));" },
+      "id": "wf001-log",
+      "name": "Registrar resultado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 480, -80 ]
+    },
+    {
+      "parameters": { "jsCode": "return [{ json: { workflow: 'WF-001', result: 'NO_APPOINTMENTS', processedAt: new Date().toISOString() } }];" },
+      "id": "wf001-empty",
+      "name": "Sin citas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 240, 120 ]
+    }
+  ],
+  "connections": {
+    "Cada hora": { "main": [ [ { "node": "Consultar citas aprobadas", "type": "main", "index": 0 } ] ] },
+    "Consultar citas aprobadas": { "main": [ [ { "node": "Preparar recordatorios", "type": "main", "index": 0 } ] ] },
+    "Preparar recordatorios": { "main": [ [ { "node": "¿Hay citas?", "type": "main", "index": 0 } ] ] },
+    "¿Hay citas?": { "main": [ [ { "node": "Enviar Gmail", "type": "main", "index": 0 } ], [ { "node": "Sin citas", "type": "main", "index": 0 } ] ] },
+    "Enviar Gmail": { "main": [ [ { "node": "Registrar resultado", "type": "main", "index": 0 } ] ] }
+  },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true },
+  "versionId": "00000000-0000-4000-8000-000000000001",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

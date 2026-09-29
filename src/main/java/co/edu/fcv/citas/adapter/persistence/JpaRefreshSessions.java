@@ -10,4 +10,8 @@ interface JpaRefreshSessions extends JpaRepository<RefreshSessionEntity, Long> {
     @Modifying
     @Query("update RefreshSessionEntity s set s.consumedAt = :now where s.userId = :userId and s.tokenIdHash = :hash and s.consumedAt is null and s.expiresAt > :now")
     int consume(@Param("userId") Long userId, @Param("hash") String hash, @Param("now") Instant now);
+
+    @Modifying
+    @Query("update RefreshSessionEntity s set s.consumedAt = :now where s.userId = :userId and s.consumedAt is null and s.expiresAt > :now")
+    int revokeAll(@Param("userId") Long userId, @Param("now") Instant now);
 }

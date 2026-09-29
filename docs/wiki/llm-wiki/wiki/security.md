@@ -12,6 +12,8 @@ No se deben registrar passwords o tokens. Los datos de pacientes, profesionales,
 
 DECISIÓN — el frontend de autenticación conserva los tokens solo en memoria de la pestaña. Esto evita persistirlos en almacenamiento JavaScript con el contrato actual; recargar vuelve el cliente a estado anónimo. La persistencia segura del refresh requiere una decisión cross-repo y un contrato distinto (por ejemplo, cookie HttpOnly con CORS de credenciales).
 
+DECISIÓN — para el laboratorio, la recuperación de contraseña puede devolver el token solo si el perfil activo es `local` y se habilita expresamente la exposición. El token es aleatorio, temporal (15 minutos), de uso único y se persiste únicamente como hash. El cliente no lo muestra, registra ni persiste; en perfiles distintos la respuesta es `202` genérica. Un restablecimiento revoca todas las sesiones refresh vigentes.
+
 ## Evidencia
 
 - [PRD 1.0](../raw/2026-09-15-prd-v1.md)

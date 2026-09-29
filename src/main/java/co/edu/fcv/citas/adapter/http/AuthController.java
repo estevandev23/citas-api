@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 class AuthController {
     private final TransactionalIdentityFacade service;
-    AuthController(TransactionalIdentityFacade service) { this.service = service; }
+    private final LocalRecoveryTokenExposure recoveryTokenExposure;
+    AuthController(TransactionalIdentityFacade service, LocalRecoveryTokenExposure recoveryTokenExposure) {
+        this.service = service; this.recoveryTokenExposure = recoveryTokenExposure;
+    }
 
     @PostMapping("/auth/register")
     ResponseEntity<RegisteredUser> register(@Valid @RequestBody RegisterRequest request) {
@@ -41,6 +44,26 @@ class AuthController {
         return response(service.refresh(request.refreshToken()));
     }
 
+    @PostMapping("/auth/logout")
+    ResponseEntity<Void> logout(@Valid @RequestBody RefreshRequest request) {
+        service.logout(request.refreshToken());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/auth/password-recovery")
+    ResponseEntity<?> passwordRecovery(@Valid @RequestBody PasswordRecoveryRequest request) {
+        var token = service.requestPasswordRecovery(request.email());
+        if (recoveryTokenExposure.enabled() && token.isPresent())
+            return ResponseEntity.accepted().body(new RecoveryResponse(token.get()));
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/auth/password-reset")
+    ResponseEntity<Void> passwordReset(@Valid @RequestBody PasswordResetRequest request) {
+        service.resetPassword(request.token(), request.newPassword());
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/session/me")
     @PreAuthorize("hasAnyRole('USER', 'PROFESSIONAL', 'ADMIN')")
     SessionView me(JwtAuthenticationToken auth) {
@@ -58,7 +81,10 @@ class AuthController {
                            @NotBlank String password) {}
     record LoginRequest(@NotBlank @Email String email, @NotBlank String password) {}
     record RefreshRequest(@NotBlank String refreshToken) {}
+    record PasswordRecoveryRequest(@NotBlank @Email String email) {}
+    record PasswordResetRequest(@NotBlank String token, @NotBlank String newPassword) {}
     record RegisteredUser(Long id, String firstName, String lastName, String email, Set<String> roles) {}
     record TokenResponse(String accessToken, String refreshToken, String tokenType) {}
+    record RecoveryResponse(String resetToken) {}
     record SessionView(Long userId, Set<String> roles) {}
 }

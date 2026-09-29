@@ -2,7 +2,7 @@
 id: EP-006
 tipo: epica
 titulo: "Reprogramación y decisiones administrativas"
-estado: Borrador
+estado: Completada
 historias: ["[[HU-018-decidir-cita-especializada]]", "[[HU-019-solicitar-reprogramacion]]", "[[HU-020-decidir-reprogramacion]]"]
 dependencias: ["[[EP-005-ciclo-de-vida-de-citas]]"]
 ---
@@ -26,7 +26,7 @@ Cambios de cita controlados sin perder la reserva original.
 - [[HU-019-solicitar-reprogramacion]]
 - [[HU-020-decidir-reprogramacion]]
 ## Criterio de completitud de la épica
-- [ ] Todas las HU están `Completada`.
-- [ ] No se pierde la cita original durante reprogramación pendiente.
+- [x] Todas las HU están `Completada`.
+- [x] No se pierde la cita original durante reprogramación pendiente.
 ## Riesgos e incógnitas
 - Payloads de notificación y transiciones permitidas pendientes.

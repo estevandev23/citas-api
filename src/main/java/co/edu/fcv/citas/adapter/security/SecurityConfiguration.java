@@ -1,7 +1,13 @@
 package co.edu.fcv.citas.adapter.security;
 
 import co.edu.fcv.citas.application.port.PasswordService;
+import co.edu.fcv.citas.application.port.PasswordResetTokens;
+import co.edu.fcv.citas.application.port.RecoveryTokenGenerator;
 import co.edu.fcv.citas.application.IdentityService;
+import co.edu.fcv.citas.application.FixedCatalogService;
+import co.edu.fcv.citas.application.ProfileService;
+import co.edu.fcv.citas.application.port.FixedCatalogs;
+import co.edu.fcv.citas.application.port.UserProfiles;
 import co.edu.fcv.citas.application.port.UserAccounts;
 import co.edu.fcv.citas.application.port.RefreshSessions;
 import co.edu.fcv.citas.application.port.TokenService;
@@ -40,9 +46,16 @@ public class SecurityConfiguration {
     @Bean Clock clock() { return Clock.systemUTC(); }
 
     @Bean IdentityService identityService(UserAccounts users, PasswordService passwords,
-                                          TokenService tokens, RefreshSessions sessions, Clock clock) {
-        return new IdentityService(users, passwords, tokens, sessions, clock);
+                                          TokenService tokens, RefreshSessions sessions,
+                                          PasswordResetTokens resetTokens, RecoveryTokenGenerator recoveryTokenGenerator,
+                                          Clock clock) {
+        return new IdentityService(users, passwords, tokens, sessions, resetTokens, recoveryTokenGenerator, clock);
     }
+
+    @Bean FixedCatalogService fixedCatalogService(FixedCatalogs catalogs) {
+        return new FixedCatalogService(catalogs);
+    }
+    @Bean ProfileService profileService(UserProfiles profiles) { return new ProfileService(profiles); }
 
     @Bean PasswordService passwordService() {
         var encoder = new BCryptPasswordEncoder();
@@ -77,7 +90,8 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh",
+                                "/api/v1/auth/logout", "/api/v1/auth/password-recovery", "/api/v1/auth/password-reset", "/api/v1/auth/bootstrap-admin").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(converter)))
                 .build();
@@ -86,7 +100,7 @@ public class SecurityConfiguration {
     @Bean CorsConfigurationSource corsConfigurationSource(@Value("${app.frontend-origin}") String origin) {
         var config = new CorsConfiguration();
         config.setAllowedOrigins(java.util.List.of(origin));
-        config.setAllowedMethods(java.util.List.of("GET", "POST", "OPTIONS"));
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

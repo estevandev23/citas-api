@@ -2,7 +2,7 @@
 id: HU-005
 tipo: historia-de-usuario
 titulo: "Gestionar perfil y afiliación"
-estado: Borrador
+estado: Completada
 epica: "[[EP-002-perfil-y-catalogos]]"
 esfuerzo: Medio
 sprint_sugerido: "Sprint 2"
@@ -18,8 +18,8 @@ dependencias: ["[[HU-002-iniciar-sesion]]", "[[HU-006-consultar-catalogos-fijos]
 ## Esfuerzo
 **Nivel:** Medio. **Justificación:** ownership, afiliación normalizada y validaciones.
 ## Tareas de desarrollo
-- [ ] **T-01 — Definir datos editables y contrato de perfil/afiliación.** Dificultad: Medio.
-- [ ] **T-02 — Implementar UI/API y pruebas de ownership.** Dificultad: Alto.
+- [x] **T-01 — Definir datos editables y contrato de perfil/afiliación.** Dificultad: Medio.
+- [x] **T-02 — Implementar UI/API y pruebas de ownership.** Dificultad: Alto.
 ## Criterios de aceptación
 ### CA-01 — Consulta propia
 **Dado** USER autenticado, **cuando** consulta perfil, **entonces** ve únicamente sus datos permitidos y afiliación actual.
@@ -28,12 +28,13 @@ dependencias: ["[[HU-002-iniciar-sesion]]", "[[HU-006-consultar-catalogos-fijos]
 ### CA-03 — Integridad de catálogo
 **Dado** una afiliación, **cuando** se guarda, **entonces** referencia EPS/plan/régimen sin duplicar sus nombres en el usuario.
 ## Definition of Done
-- [ ] CA-01 a CA-03 validados.
-- [ ] Ownership y validación server-side comprobados.
-- [ ] Evidencia de 3FN y trazabilidad Scrum actualizadas.
+- [x] CA-01 a CA-03 validados.
+- [x] Ownership y validación server-side comprobados.
+- [x] Evidencia de 3FN y trazabilidad Scrum actualizadas.
 ## Evidencia de validación
 | Elemento | Resultado | Evidencia |
 |---|---|---|
-| CA-01 a CA-03 y DoD | Pendiente | — |
+| CA-01 a CA-03 y DoD | Cumple | `ProfileController`, `ProfileService`, `PatientProfileView`, `AuthFlowTest.userCanOnlyReadAndUpdateTheirOwnNormalizedProfile` |
 ## Historial de validación
 - 2026-09-17 — HU creada en estado `Borrador`.
+- 2026-09-29 — Perfil, afiliación normalizada, ownership y UI validados en Docker. Estado final: `Completada`.

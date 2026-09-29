@@ -24,6 +24,10 @@ class UserPersistenceAdapter implements UserAccounts {
         try { return map(repo.saveAndFlush(entity)); }
         catch (DataIntegrityViolationException ex) { throw new IdentityException("IDENTITY_EXISTS", "Email o documento ya registrado"); }
     }
+    public void updatePassword(Long userId, String passwordHash) {
+        if (repo.updatePassword(userId, passwordHash) != 1)
+            throw new IdentityException("INVALID_RESET_TOKEN", "Token de recuperación no válido");
+    }
     private UserAccount map(UserEntity u) {
         return new UserAccount(u.id, u.firstName, u.lastName, u.documentType, u.documentNumber,
                 u.email, u.phone, u.passwordHash, u.active, java.util.Set.copyOf(u.roles));

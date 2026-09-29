@@ -14,4 +14,5 @@ class RefreshPersistenceAdapter implements RefreshSessions {
         repo.save(session);
     }
     public boolean consume(Long userId, String hash, Instant now) { return repo.consume(userId, hash, now) == 1; }
+    public void revokeAll(Long userId, Instant now) { repo.revokeAll(userId, now); }
 }
