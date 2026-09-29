@@ -24,7 +24,7 @@ relacionadas: []
 **Nivel:** Medio. **Justificación:** ciclo de tokens y coherencia cliente-servidor.
 ## Tareas de desarrollo
 - [x] **T-01 — Definir contrato de refresh/logout y manejo de sesión expirada.** Dificultad: Medio. Logout idempotente y vigencia residual del access documentados.
-- [x] **T-02 — Implementar flujo de renovación/cierre en API y cliente.** Dificultad: Alto. API revoca refresh y el cliente limpia la sesión en memoria aun ante error de red.
+- [x] **T-02 — Implementar flujo de renovación/cierre en API y cliente.** Dificultad: Alto. API revoca/rota el refresh en cookie HttpOnly y el cliente valida/restaura la sesión desde `sessionStorage`, rota el access cuando expira y limpia la sesión aun ante error de red.
 - [x] **T-03 — Probar refresh vencido, consumido y renovación válida.** Dificultad: Medio.
 ## Criterios de aceptación
 ### CA-01 — Renovación válida
@@ -44,7 +44,7 @@ relacionadas: []
 | CA-01 — Renovación válida | Cumple | `IdentityService#refresh`; `AuthFlowTest.loginRefreshAndProtectedResourceAreSeparated` | Rota access/refresh sin contraseña. |
 | CA-02 — Cierre | Cumple en pruebas | `POST /api/v1/auth/logout`; `AuthFlowTest.logoutRevokesOnlyTheSubmittedRefreshAndIsIdempotent`; `AuthProvider#logout` | Revoca el refresh presentado y el cliente limpia memoria en `finally`. |
 | CA-03 — Refresh inválido | Cumple | `AuthFlowTest` y `expiredRefreshIsRejected` | Refresh usado, access presentado como refresh y refresh vencido retornan `401`. |
-| DoD — Cliente limpia estado | Cumple por revisión y prueba de cliente REST | `citas-web/features/auth/auth-provider.tsx`; `citas-web/tests/api.test.ts` | Tokens no se persisten; logout limpia sesión y refresh en memoria. |
+| DoD — Cliente limpia/restaura estado | Cumple por revisión, prueba REST y E2E en contenedores | `citas-web/features/auth/auth-provider.tsx`; `citas-web/tests/api.test.ts` | El access vive en memoria/`sessionStorage`, el refresh en cookie HttpOnly, se valida/rota al recargar y logout limpia/revoca la sesión. |
 | DoD — Pruebas y contrato | Cumple en suites | `AuthFlowTest` (7 pruebas totales); `citas-web/tests/api.test.ts` (5 pruebas); `llm-wiki/wiki/rest-contracts.md` | Falta recorrido manual API↔web con perfil Docker `local`. |
 | DoD — Trazabilidad | Cumple | Esta matriz e historial | Evidencia vinculada. |
 ## Historial de validación

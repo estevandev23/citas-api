@@ -15,9 +15,9 @@ La integración es REST/JSON directa entre `citas-web` y `citas-api`. Todo cambi
 | Operación | Solicitud JSON | Éxito | Errores esperados |
 |---|---|---|---|
 | `POST /api/v1/auth/register` | `firstName`, `lastName`, `documentType`, `documentNumber`, `email`, `phone`, `password` | `201`: `id`, `firstName`, `lastName`, `email`, `roles` | `400 VALIDATION_ERROR` con `fields`; `409 EMAIL_EXISTS` / `DOCUMENT_EXISTS` / `IDENTITY_EXISTS` |
-| `POST /api/v1/auth/login` | `email`, `password` | `200`: `accessToken`, `refreshToken`, `tokenType: Bearer` | `400 VALIDATION_ERROR`; `401 INVALID_CREDENTIALS` |
-| `POST /api/v1/auth/refresh` | `refreshToken` | `200`: nuevo access y refresh con el mismo formato del login | `400 VALIDATION_ERROR`; `401 INVALID_REFRESH` |
-| `POST /api/v1/auth/logout` | `refreshToken` | `204` sin cuerpo | `400 VALIDATION_ERROR` |
+| `POST /api/v1/auth/login` | `email`, `password` | `200`: access en JSON y refresh rotatorio en cookie `HttpOnly` `citas_refresh` (también se conserva el campo JSON por compatibilidad) | `400 VALIDATION_ERROR`; `401 INVALID_CREDENTIALS` |
+| `POST /api/v1/auth/refresh` | `refreshToken` opcional; si se omite usa cookie `citas_refresh` | `200`: nuevo access y refresh, con cookie rotada | `400 VALIDATION_ERROR`; `401 INVALID_REFRESH` |
+| `POST /api/v1/auth/logout` | `refreshToken` opcional; si se omite usa cookie | `204` sin cuerpo y cookie expirada | `400 VALIDATION_ERROR` |
 | `POST /api/v1/auth/password-recovery` | `email` | `202` sin cuerpo; en perfil `local` configurado, el email existente recibe `resetToken` solo para el laboratorio | `400 VALIDATION_ERROR` |
 | `POST /api/v1/auth/password-reset` | `token`, `newPassword` | `204` sin cuerpo | `400 VALIDATION_ERROR` / `INVALID_RESET_TOKEN` |
 | `GET /api/v1/session/me` | `Authorization: Bearer <accessToken>` | `200`: `userId`, `roles` | `401` sin access válido; autorización por roles |
@@ -28,7 +28,7 @@ La integración es REST/JSON directa entre `citas-web` y `citas-api`. Todo cambi
 
 El email se guarda en minúsculas. La unicidad de documento se aplica a la pareja `documentType` + `documentNumber`. El refresh válido rota los dos tokens y consume el refresh anterior. El access token no sirve para refresh ni el refresh para recursos protegidos. La respuesta de registro no incluye contraseña ni hash.
 
-Logout es idempotente: consume el refresh presentado si sigue vigente y responde `204` incluso si ya fue usado o no es válido. El access JWT ya emitido no se revoca y conserva su vigencia corta configurada. El cliente mantiene access/refresh solo en memoria; al salir intenta revocar el refresh y limpia ambos valores aunque la red falle.
+Logout es idempotente: consume el refresh presentado si sigue vigente y responde `204` incluso si ya fue usado o no es válido. El access JWT ya emitido no se revoca y conserva su vigencia corta configurada. El cliente mantiene el access en memoria/`sessionStorage`, usa la cookie HttpOnly para restaurar/rotar al recargar, y al salir intenta revocar el refresh y limpia el estado aunque la red falle. Las peticiones de autenticación usan credenciales CORS.
 
 La recuperación devuelve `202` para no exponer la existencia de una cuenta. El token tiene vigencia de 15 minutos, se usa una sola vez y, tras el cambio de contraseña, todas las sesiones refresh vigentes del usuario quedan revocadas. Solo el perfil `local`, con exposición habilitada explícitamente, lo retorna en la respuesta controlada; el cliente lo conserva en memoria, nunca lo muestra ni lo persiste. SMTP queda fuera del alcance actual.
 

@@ -6,8 +6,12 @@ import co.edu.fcv.citas.domain.UserAccount;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Duration;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -22,8 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 class AuthController {
     private final TransactionalIdentityFacade service;
     private final LocalRecoveryTokenExposure recoveryTokenExposure;
-    AuthController(TransactionalIdentityFacade service, LocalRecoveryTokenExposure recoveryTokenExposure) {
+    private final long refreshDays;
+    AuthController(TransactionalIdentityFacade service, LocalRecoveryTokenExposure recoveryTokenExposure,
+                   @Value("${app.jwt.refresh-days:7}") long refreshDays) {
         this.service = service; this.recoveryTokenExposure = recoveryTokenExposure;
+        this.refreshDays = refreshDays;
     }
 
     @PostMapping("/auth/register")
@@ -35,19 +42,27 @@ class AuthController {
     }
 
     @PostMapping("/auth/login")
-    TokenResponse login(@Valid @RequestBody LoginRequest request) {
-        return response(service.login(request.email(), request.password()));
+    ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        var tokens = service.login(request.email(), request.password());
+        return withRefreshCookie(response(tokens), tokens.refreshToken());
     }
 
     @PostMapping("/auth/refresh")
-    TokenResponse refresh(@Valid @RequestBody RefreshRequest request) {
-        return response(service.refresh(request.refreshToken()));
+    ResponseEntity<TokenResponse> refresh(@Valid @RequestBody(required = false) RefreshRequest request,
+                                          @org.springframework.web.bind.annotation.CookieValue(name = REFRESH_COOKIE, required = false) String cookie) {
+        String token = request != null && request.refreshToken() != null && !request.refreshToken().isBlank()
+                ? request.refreshToken() : cookie;
+        var tokens = service.refresh(token == null ? "" : token);
+        return withRefreshCookie(response(tokens), tokens.refreshToken());
     }
 
     @PostMapping("/auth/logout")
-    ResponseEntity<Void> logout(@Valid @RequestBody RefreshRequest request) {
-        service.logout(request.refreshToken());
-        return ResponseEntity.noContent().build();
+    ResponseEntity<Void> logout(@Valid @RequestBody(required = false) RefreshRequest request,
+                                @org.springframework.web.bind.annotation.CookieValue(name = REFRESH_COOKIE, required = false) String cookie) {
+        String token = request != null && request.refreshToken() != null && !request.refreshToken().isBlank()
+                ? request.refreshToken() : cookie;
+        service.logout(token == null ? "" : token);
+        return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, clearRefreshCookie().toString()).build();
     }
 
     @PostMapping("/auth/password-recovery")
@@ -71,8 +86,24 @@ class AuthController {
                 Set.copyOf(auth.getToken().getClaimAsStringList("roles")));
     }
 
+    private static final String REFRESH_COOKIE = "citas_refresh";
+
     private TokenResponse response(TokenService.IssuedTokens tokens) {
         return new TokenResponse(tokens.accessToken(), tokens.refreshToken(), "Bearer");
+    }
+
+    private ResponseEntity<TokenResponse> withRefreshCookie(TokenResponse response, String refreshToken) {
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, refreshCookie(refreshToken).toString()).body(response);
+    }
+
+    private ResponseCookie refreshCookie(String token) {
+        return ResponseCookie.from(REFRESH_COOKIE, token).httpOnly(true).secure(false).sameSite("Lax")
+                .path("/api/v1/auth").maxAge(Duration.ofDays(refreshDays)).build();
+    }
+
+    private ResponseCookie clearRefreshCookie() {
+        return ResponseCookie.from(REFRESH_COOKIE, "").httpOnly(true).secure(false).sameSite("Lax")
+                .path("/api/v1/auth").maxAge(Duration.ZERO).build();
     }
 
     record RegisterRequest(@NotBlank String firstName, @NotBlank String lastName,

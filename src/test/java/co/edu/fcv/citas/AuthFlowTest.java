@@ -169,6 +169,9 @@ class AuthFlowTest {
         String access = loginJson.get("accessToken").asText();
         String refresh = loginJson.get("refreshToken").asText();
         assertThat(access).isNotEqualTo(refresh);
+        var refreshCookie = login.getResponse().getCookie("citas_refresh");
+        assertThat(refreshCookie).isNotNull();
+        assertThat(refreshCookie.isHttpOnly()).isTrue();
 
         mvc.perform(get("/api/v1/session/me").header("Authorization", "Bearer " + access))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.roles[0]").value("USER"));
@@ -187,6 +190,11 @@ class AuthFlowTest {
         assertThat(postJson("/api/v1/auth/refresh", Map.of("refreshToken", refresh)).getResponse().getStatus()).isEqualTo(401);
         assertThat(postJson("/api/v1/auth/refresh", Map.of("refreshToken", access)).getResponse().getStatus()).isEqualTo(401);
         assertThat(postJson("/api/v1/auth/refresh", Map.of("refreshToken", "not-a-token")).getResponse().getStatus()).isEqualTo(401);
+
+        var cookieLogin = postJson("/api/v1/auth/login", Map.of("email", body.get("email"), "password", body.get("password")));
+        var cookieRefresh = cookieLogin.getResponse().getCookie("citas_refresh");
+        assertThat(mvc.perform(post("/api/v1/auth/refresh").cookie(cookieRefresh))
+                .andExpect(status().isOk()).andReturn().getResponse().getCookie("citas_refresh")).isNotNull();
     }
 
     @Test
