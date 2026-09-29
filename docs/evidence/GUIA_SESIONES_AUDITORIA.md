@@ -20,11 +20,11 @@ El núcleo funcional S2–S4 está implementado y usable contra los contenedores
 | S6 | WF-002 JSON sin credenciales | Cumple | `automations/n8n/WF-002-status-notifications.json` |
 | S6 | WF-003 opcional | Cumple como bonus | `automations/n8n/WF-003-daily-operational-summary.json` |
 | S6 | JSON validado/importable | Cumple estructuralmente | `scripts/validate-n8n-json.ps1` |
-| S6 | Sustentación y trazabilidad Git | Parcial | `main`/`develop` existen; los commits históricos S2 no cubren todavía un commit separado por cada sesión S3–S6 |
+| S6 | Sustentación y trazabilidad Git | Cumple en repositorio | `main` permanece estable y `develop` contiene commits separados para S3, S4, S5 y S6 en ambos repos; S2 queda representado por los commits históricos de bootstrap/login |
 
 ## Configuración externa pendiente
 
-Los workflows quedan inactivos (`active: false`) y no contienen credenciales. Para activarlos en n8n el trainer debe configurar el nodo Gmail y las variables `CITAS_API_BASE_URL`, `CITAS_API_TOKEN` y, para WF-003, `OPERATIONS_EMAIL`. La activación no se simula ni se hace con credenciales dentro del repositorio.
+Los workflows quedan inactivos (`active: false`) y no contienen credenciales. Para activarlos en n8n el trainer debe configurar el nodo Gmail y las variables `CITAS_API_BASE_URL`, `CITAS_API_TOKEN` y, para WF-003, `OPERATIONS_EMAIL`. La activación y la invocación MCP contra una instancia externa no se simulan ni se hacen con credenciales dentro del repositorio; por eso permanecen como pendiente operativo del entorno del trainer, no como faltante de código/versionado.
 
 ## Validación de uso
 
